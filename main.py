@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-My first game, wrote by pygame 
+LD theme: start with nothing
 @author: ZHANG Chenyu
 """
 
@@ -26,6 +26,10 @@ else:
     screen.set_alpha(None)
 pygame.display.set_caption('start with nothing')
 
+pygame.mixer.init()
+gain_sound = pygame.mixer.Sound('resources/sound/gain.mp3')
+lose_sound = pygame.mixer.Sound('resources/sound/lose.mp3')
+
 def is_prime(num):
     if num < 2:
         return False
@@ -44,25 +48,39 @@ def open():
         screen.fill(0)
         text1 = font.render(str("You start with nothing in your life"), True, (255, 255, 255))
         text_rect1 = text1.get_rect()
-        text_rect1.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 100]
+        text_rect1.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 150]
+
         text2 = font.render(str("But you will meet different people"), True, (255, 255, 255))
         text_rect2 = text2.get_rect()
-        text_rect2.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50]
+        text_rect2.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 100]
+
         text3 = font.render(str("You should choose wisely"), True, (255, 255, 255))
         text_rect3 = text3.get_rect()
-        text_rect3.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 ]
+        text_rect3.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50]
+
         text4 = font.render(str("The one shares the same quality will make you stronger"), True, (255, 255, 255))
         text_rect4 = text4.get_rect()
-        text_rect4.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50]
+        text_rect4.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2]
+
         text5 = font.render(str("Or else it will make you weaker, or even dead"), True, (255, 255, 255))
         text_rect5 = text5.get_rect()
-        text_rect5.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 100]
+        text_rect5.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50]
+
+        text6 = font.render(str("Tap space to start the game"), True, (255, 255, 255))
+        text_rect6 = text6.get_rect()
+        text_rect6.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 100]
+
+        text7 = font.render(str("And use direction keys to control"), True, (255, 255, 255))
+        text_rect7 = text7.get_rect()
+        text_rect7.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 150]
 
         screen.blit(text1, text_rect1)
         screen.blit(text2, text_rect2)
         screen.blit(text3, text_rect3)
         screen.blit(text4, text_rect4)
         screen.blit(text5, text_rect5)
+        screen.blit(text6, text_rect6)
+        screen.blit(text7, text_rect7)
 
         key_pressed = pygame.key.get_pressed()
         if key_pressed[K_SPACE]:
@@ -97,7 +115,7 @@ def fail():
 def game():
     clock = pygame.time.Clock()
     player_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
-    friend_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    friend_font = pygame.font.Font('freesansbold.ttf', 24)  # 字体大小的
 
     player_number = 0
     player_pos = [SCREEN_WIDTH/2, 400]
@@ -123,12 +141,14 @@ def game():
             offset = max(10, player.number//4)
             friend_number = random.randint(max(2, player.number - offset), max(10, player.number + offset))
             choice = random.randint(0, 10)
-            if choice < 6:
+            if choice < 4:
                 friend = Friend(friend_number, friend_pos, friend_font)
-            elif choice < 8:
+            elif choice < 6:
                 friend = FriendCross(friend_number, friend_pos, friend_font, SCREEN_WIDTH)
-            else:
+            elif choice < 8:
                 friend = FriendVari(friend_number, friend_pos, friend_font)
+            else:
+                friend = FriendDisappear(friend_number, friend_pos, friend_font)
 
             friend_group.add(friend)
             friend_frequence = 0
@@ -140,21 +160,30 @@ def game():
             friend.move()
             if not friend.static:
                 friend.increment()
+            if friend.disappear:
+                friend.show_count()
             # 判断玩家是否被击中
             if pygame.sprite.collide_rect(friend, player):
                 if player.number == 0 or player.number == 1:
+                    gain_sound.play()
                     player.change_number(friend.number)
                 elif is_prime(friend.number) and is_prime(player.number):
+                    gain_sound.play()
                     player.change_number(friend.number)
                 elif not is_prime(friend.number) and not is_prime(player.number):
+                    gain_sound.play()
                     player.change_number(friend.number)
                 else:
+                    lose_sound.play()
                     player.change_number(-friend.number)
                 friend_group.remove(friend)
 
             if friend.rect.top > SCREEN_HEIGHT:
                 friend_group.remove(friend)
-            screen.blit(friend.text, friend.rect)
+            if not friend.disappear:
+                screen.blit(friend.text, friend.rect)
+            elif friend.show:
+                screen.blit(friend.text, friend.rect)
 
         # screen.blit(timeout_img, (SCREEN_WIDTH - 100, 60))
         # 监听键盘事件

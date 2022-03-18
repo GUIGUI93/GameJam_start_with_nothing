@@ -17,6 +17,7 @@ class Friend(pygame.sprite.Sprite):
         self.rect.center = init_pos
         self.speed = 2
         self.static = True
+        self.disappear = False
 
     def move(self):
         self.rect.top += self.speed  # 子弹的位置不断的往前
@@ -55,6 +56,23 @@ class FriendVari(Friend):
             self.text = self.font.render(str(self.number), True, (255, 255, 255))
             self.count = 0
 
+class FriendDisappear(Friend):
+    def __init__(self, number, init_pos, font):
+        Friend.__init__(self, number, init_pos, font)
+        self.disappear = True
+        self.count = 0
+        self.speed = 1
+        self.threshold = 50
+        self.show = True
+
+    def show_count(self):
+        self.count += 1
+        if self.count >= self.threshold:
+            self.count = 0
+            if self.show:
+                self.show = False
+            else:
+                self.show = True
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, number, init_pos, font, WIDTH, HEIGHT):
@@ -71,7 +89,9 @@ class Player(pygame.sprite.Sprite):
     def change_number(self, num):
         self.number += num
         self.text = self.font.render(str(self.number), True, (255, 255, 255))
-        # self.rect = self.text.get_rect()
+        current_pos = self.rect.center
+        self.rect = self.text.get_rect()
+        self.rect.center = current_pos
 
     def move_up(self):  #移动的时候如果要超出屏幕就不能动了
         if self.rect.top <= 0:
