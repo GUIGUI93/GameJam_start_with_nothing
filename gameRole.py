@@ -85,13 +85,50 @@ class Player(pygame.sprite.Sprite):
         self.speed = 7
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
+        self.font_list = []
+        self.font_list.append(pygame.font.Font('freesansbold.ttf', 12))
+        self.font_list.append(pygame.font.Font('freesansbold.ttf', 16))
+        self.font_list.append(pygame.font.Font('freesansbold.ttf', 24))
+        self.font_list.append(font)
+        self.grow_mode = 0
+        self.grow_count = 0
+        self.grow_threshold = 10
+
+    def change_font1(self):
+        self.grow_count += 1
+        index = self.grow_count // self.grow_threshold
+        flag = self.grow_count % self.grow_threshold
+        if flag == 0:
+            self.text = self.font_list[index].render(str(self.number), True, (255, 255, 255))
+            current_pos = self.rect.center
+            self.rect = self.text.get_rect()
+            self.rect.center = current_pos
+        if self.grow_count > 31:
+            self.grow_mode = 0
+            self.grow_count = 0
+
+    def change_font2(self):
+        self.grow_count += 1
+        index = self.grow_count // self.grow_threshold
+        flag = self.grow_count % self.grow_threshold
+        if flag == 0:
+            if index % 2 == 0:
+                self.text = self.font_list[0].render(str(self.number), True, (255, 255, 255))
+            else:
+                self.text = self.font_list[-1].render(str(self.number), True, (255, 255, 255))
+            current_pos = self.rect.center
+            self.rect = self.text.get_rect()
+            self.rect.center = current_pos
+        if self.grow_count > 31:
+            self.grow_mode = 0
+            self.grow_count = 0
 
     def change_number(self, num):
         self.number += num
-        self.text = self.font.render(str(self.number), True, (255, 255, 255))
-        current_pos = self.rect.center
-        self.rect = self.text.get_rect()
-        self.rect.center = current_pos
+        # self.text = self.font.render(str(self.number), True, (255, 255, 255))
+        # current_pos = self.rect.center
+        # self.rect = self.text.get_rect()
+        # self.rect.center = current_pos
 
     def move_up(self):  #移动的时候如果要超出屏幕就不能动了
         if self.rect.top <= 0:

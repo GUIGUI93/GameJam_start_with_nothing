@@ -29,6 +29,7 @@ pygame.display.set_caption('start with nothing')
 pygame.mixer.init()
 gain_sound = pygame.mixer.Sound('resources/sound/gain.mp3')
 lose_sound = pygame.mixer.Sound('resources/sound/lose.mp3')
+victory_sound = pygame.mixer.Sound('resources/sound/victory.wav')
 
 def is_prime(num):
     if num < 2:
@@ -66,7 +67,7 @@ def open():
         text_rect5 = text5.get_rect()
         text_rect5.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50]
 
-        text6 = font.render(str("Tap space to start the game"), True, (255, 255, 255))
+        text6 = font.render(str("Tap space key to start the game"), True, (255, 255, 255))
         text_rect6 = text6.get_rect()
         text_rect6.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 100]
 
@@ -95,15 +96,25 @@ def open():
 
 
 def fail():
-    font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    font = pygame.font.Font('freesansbold.ttf', 24)  # 字体大小的
     clock = pygame.time.Clock()
     while 1:
         clock.tick(60)
         screen.fill(0)
-        text = font.render(str("Sorry you failed, now go watch some porns"), True, (255, 255, 255))
-        text_rect = text.get_rect()
-        text_rect.center = [SCREEN_WIDTH/2, SCREEN_HEIGHT/2]
-        screen.blit(text, text_rect)
+        text1 = font.render(str("Sorry you failed, choose more wisely next time!"), True, (255, 255, 255))
+        text_rect1 = text1.get_rect()
+        text_rect1.center = [SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 50]
+        text2 = font.render(str("Tap space key to restart the game"), True, (255, 255, 255))
+        text_rect2 = text2.get_rect()
+        text_rect2.center = [SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50]
+
+        screen.blit(text1, text_rect1)
+        screen.blit(text2, text_rect2)
+
+        key_pressed = pygame.key.get_pressed()
+        if key_pressed[K_SPACE]:
+            return
+
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -111,6 +122,33 @@ def fail():
                 pygame.quit()
                 exit()
 
+def win():
+    font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    clock = pygame.time.Clock()
+    victory_sound.play()
+    while 1:
+        clock.tick(60)
+        screen.fill(0)
+        text1 = font.render(str("Congratulations! You win!"), True, (255, 255, 255))
+        text_rect1 = text1.get_rect()
+        text_rect1.center = [SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 50]
+        text2 = font.render(str("Tap space key to restart the game"), True, (255, 255, 255))
+        text_rect2 = text2.get_rect()
+        text_rect2.center = [SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50]
+
+        screen.blit(text1, text_rect1)
+        screen.blit(text2, text_rect2)
+
+        key_pressed = pygame.key.get_pressed()
+        if key_pressed[K_SPACE]:
+            return
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
 
 def game():
     clock = pygame.time.Clock()
@@ -125,9 +163,6 @@ def game():
     friend_frequence = 0
     friend_interval = 100
 
-    time_count = 0
-    time_threshold = 100
-
     while 1:
         # 控制游戏最大帧率为60
         clock.tick(60)
@@ -138,8 +173,19 @@ def game():
 
         if friend_frequence == friend_interval:  # 通过这个数字来确定出现的频率
             friend_pos = [random.randint(0, SCREEN_WIDTH - 50), 0]
-            offset = max(10, player.number//4)
-            friend_number = random.randint(max(2, player.number - offset), max(10, player.number + offset))
+            if is_prime(player.number) or player.number == 0 or player.number == 1:
+                offset = max(10, player.number//4)
+                friend_number = random.randint(max(2, min(player.number - offset, 100)), max(10, min(player.number + offset, 150)))
+            else:
+                choice = random.randint(0, 10)
+                if choice < 6:
+                    prime_list = [11, 19, 23, 31, 37, 47, 53, 59, 61, 67, 73, 89, 91]
+                    index = random.randint(0, 12)
+                    friend_number = prime_list[index]
+                else:
+                    offset = max(10, player.number // 4)
+                    friend_number = random.randint(max(2, min(player.number - offset, 100)), max(10, min(player.number + offset, 150)))
+
             choice = random.randint(0, 10)
             if choice < 4:
                 friend = Friend(friend_number, friend_pos, friend_font)
@@ -167,15 +213,19 @@ def game():
                 if player.number == 0 or player.number == 1:
                     gain_sound.play()
                     player.change_number(friend.number)
+                    player.grow_mode = 1
                 elif is_prime(friend.number) and is_prime(player.number):
                     gain_sound.play()
                     player.change_number(friend.number)
+                    player.grow_mode = 1
                 elif not is_prime(friend.number) and not is_prime(player.number):
                     gain_sound.play()
                     player.change_number(friend.number)
+                    player.grow_mode = 1
                 else:
                     lose_sound.play()
                     player.change_number(-friend.number)
+                    player.grow_mode = 2
                 friend_group.remove(friend)
 
             if friend.rect.top > SCREEN_HEIGHT:
@@ -198,16 +248,16 @@ def game():
         if key_pressed[K_d] or key_pressed[K_RIGHT]:
             player.move_right()
 
+        if player.grow_mode == 1:
+            player.change_font1()
+        elif player.grow_mode == 2:
+            player.change_font2()
         screen.blit(player.text, player.rect)
 
         if player.number < 0:
-            fail()
-
-        # time_count += 1
-        # if time_count >= time_threshold:
-        #     if player.number > 0:
-        #         player.change_number(-1)
-        #     time_count = 0
+            return False
+        if player.number > 1000:
+            return True
 
         # 更新屏幕
         pygame.display.update()
@@ -220,5 +270,11 @@ def game():
 
 if __name__ == '__main__':
     open()
-    game()
+    while(1):
+        res = game()
+        if res:
+            win()
+        else:
+            fail()
+
         
