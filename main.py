@@ -42,38 +42,42 @@ def is_prime(num):
 
 # 开始画面
 def open():
-    font = pygame.font.Font('freesansbold.ttf', 24)  # 字体大小的
+    font = pygame.font.Font(None, 32)  # 字体大小的
     clock = pygame.time.Clock()
     while 1:
         clock.tick(60)
         screen.fill(0)
         text1 = font.render(str("You start with nothing in your life"), True, (255, 255, 255))
         text_rect1 = text1.get_rect()
-        text_rect1.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 150]
+        text_rect1.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 200]
 
         text2 = font.render(str("But you will meet different people"), True, (255, 255, 255))
         text_rect2 = text2.get_rect()
-        text_rect2.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 100]
+        text_rect2.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 150]
 
         text3 = font.render(str("You should choose wisely"), True, (255, 255, 255))
         text_rect3 = text3.get_rect()
-        text_rect3.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50]
+        text_rect3.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 100]
 
         text4 = font.render(str("The one shares the same quality will make you stronger"), True, (255, 255, 255))
         text_rect4 = text4.get_rect()
-        text_rect4.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2]
+        text_rect4.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 50]
 
         text5 = font.render(str("Or else it will make you weaker, or even dead"), True, (255, 255, 255))
         text_rect5 = text5.get_rect()
-        text_rect5.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50]
+        text_rect5.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 ]
 
         text6 = font.render(str("Tap space key to start the game"), True, (255, 255, 255))
         text_rect6 = text6.get_rect()
-        text_rect6.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 100]
+        text_rect6.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50]
 
         text7 = font.render(str("And use direction keys to control"), True, (255, 255, 255))
         text_rect7 = text7.get_rect()
-        text_rect7.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 150]
+        text_rect7.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 100]
+
+        text8 = font.render(str("See if you can reach 1000, good luck!"), True, (255, 255, 255))
+        text_rect8 = text8.get_rect()
+        text_rect8.center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 150]
 
         screen.blit(text1, text_rect1)
         screen.blit(text2, text_rect2)
@@ -82,6 +86,7 @@ def open():
         screen.blit(text5, text_rect5)
         screen.blit(text6, text_rect6)
         screen.blit(text7, text_rect7)
+        screen.blit(text8, text_rect8)
 
         key_pressed = pygame.key.get_pressed()
         if key_pressed[K_SPACE]:
@@ -96,7 +101,7 @@ def open():
 
 
 def fail():
-    font = pygame.font.Font('freesansbold.ttf', 24)  # 字体大小的
+    font = pygame.font.Font(None, 32)  # 字体大小的
     clock = pygame.time.Clock()
     while 1:
         clock.tick(60)
@@ -123,7 +128,7 @@ def fail():
                 exit()
 
 def win():
-    font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
+    font = pygame.font.Font(None, 36)  # 字体大小的
     clock = pygame.time.Clock()
     victory_sound.play()
     while 1:
@@ -152,8 +157,8 @@ def win():
 
 def game():
     clock = pygame.time.Clock()
-    player_font = pygame.font.Font('freesansbold.ttf', 32)  # 字体大小的
-    friend_font = pygame.font.Font('freesansbold.ttf', 24)  # 字体大小的
+    player_font = pygame.font.Font(None, 40)  # 字体大小的
+    friend_font = pygame.font.Font(None, 32)  # 字体大小的
 
     player_number = 0
     player_pos = [SCREEN_WIDTH/2, 400]

@@ -86,9 +86,9 @@ class Player(pygame.sprite.Sprite):
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
         self.font_list = []
-        self.font_list.append(pygame.font.Font('freesansbold.ttf', 12))
-        self.font_list.append(pygame.font.Font('freesansbold.ttf', 16))
-        self.font_list.append(pygame.font.Font('freesansbold.ttf', 24))
+        self.font_list.append(pygame.font.Font(None, 12))
+        self.font_list.append(pygame.font.Font(None, 20))
+        self.font_list.append(pygame.font.Font(None, 30))
         self.font_list.append(font)
         self.grow_mode = 0
         self.grow_count = 0
